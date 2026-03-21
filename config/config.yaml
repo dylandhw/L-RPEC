@@ -1,0 +1,13 @@
+# api paths mapped to services
+# set to httpbin.org standard http methods (again, for convenience)
+routes:
+  - path: /delete
+    upstream: http://localhost:1000
+  - path: /get
+    upstream: http://localhost:1010
+  - path: /patch
+    upstream: http://localhost:1020
+  - path: /post
+    upstream: http://localhost:1030
+  - path: /put
+    upstream: http://localhost:1040
