@@ -18,8 +18,12 @@ import (
 // httpbin.org and gives the client the response
 func main() {
 
-	// viper setups
-	viper.SetConfigFile("../config/config.yaml")
+	// viper setup
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath("./config")
+	viper.AddConfigPath("../config")
+
 	err := viper.ReadInConfig()
 	if err != nil {
 		fmt.Printf("err reading config file: %s\n", err)
