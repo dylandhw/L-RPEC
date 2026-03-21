@@ -3,10 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"net/http/httputil"
-	"net/url"
 
-	internal "github.com/dylandhw/L-RPEC/internal/proxy"
+	"github.com/dylandhw/L-RPEC/internal/proxy"
 	"github.com/spf13/viper"
 )
 
@@ -31,20 +29,14 @@ func main() {
 	}
 	fmt.Printf("config settings: \n%+v\n", viper.AllSettings())
 
-	var routes []internal.Route
+	var routes []proxy.Route
 	viper.UnmarshalKey("routes", &routes)
-
-	target, _ := url.Parse("https://httpbin.org/")
-
 	for route := range routes {
 		fmt.Println("route: ", route)
 
 	}
 
-	proxy := httputil.NewSingleHostReverseProxy(target)
-
-	// handles a reverseproxy object
-	http.Handle("/", proxy)
+	http.Handle("/", proxy.New(routes)) // need to handle requests to url
 
 	fmt.Println("server started on port 8080")
 	err = http.ListenAndServe(":8080", nil)
