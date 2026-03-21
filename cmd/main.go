@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+
+	"github.com/spf13/viper"
 )
 
 /*
@@ -15,6 +17,8 @@ import (
 // small reverse proxy set up. client reaches out to the server, server goes to
 // httpbin.org and gives the client the response
 func main() {
+	viper.AddConfigPath("/L-REPC/config/config.yaml")
+
 	// targets http testing service
 	target, _ := url.Parse("https://httpbin.org/")
 	proxy := httputil.NewSingleHostReverseProxy(target)
