@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 )
 
 /*
@@ -10,12 +12,11 @@ import (
  * hardcoded for now **
  */
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "requested url: %s", r.URL.Path)
-}
-
 func main() {
-	http.HandleFunc("/", handler)
+	target, _ := url.Parse("https://httpbin.org/")
+	proxy := httputil.NewSingleHostReverseProxy(target)
+
+	http.Handle("/", proxy) // takes reverseproxy obj
 
 	fmt.Println("server started on port 8080")
 	err := http.ListenAndServe(":8080", nil)
