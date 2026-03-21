@@ -17,7 +17,14 @@ import (
 // small reverse proxy set up. client reaches out to the server, server goes to
 // httpbin.org and gives the client the response
 func main() {
-	viper.AddConfigPath("/L-REPC/config/config.yaml")
+
+	// viper setups
+	viper.SetConfigFile("../config/config.yaml")
+	err := viper.ReadInConfig()
+	if err != nil {
+		fmt.Printf("err reading config file: %s\n", err)
+	}
+	fmt.Printf("config settings: \n%+v\n", viper.AllSettings())
 
 	// targets http testing service
 	target, _ := url.Parse("https://httpbin.org/")
@@ -27,7 +34,7 @@ func main() {
 	http.Handle("/", proxy)
 
 	fmt.Println("server started on port 8080")
-	err := http.ListenAndServe(":8080", nil)
+	err = http.ListenAndServe(":8080", nil)
 	if err != nil {
 		fmt.Println("error serving", err)
 	}
