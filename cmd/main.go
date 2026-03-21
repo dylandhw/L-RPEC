@@ -33,12 +33,14 @@ func main() {
 
 	var routes []internal.Route
 	viper.UnmarshalKey("routes", &routes)
+
+	target, _ := url.Parse("https://httpbin.org/")
+
 	for route := range routes {
 		fmt.Println("route: ", route)
+
 	}
 
-	// targets http testing service
-	target, _ := url.Parse("https://httpbin.org/")
 	proxy := httputil.NewSingleHostReverseProxy(target)
 
 	// handles a reverseproxy object

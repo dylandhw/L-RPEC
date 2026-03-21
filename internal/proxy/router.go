@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"strings"
@@ -13,7 +13,7 @@ type Route struct {
 func Match(routes []Route, path string) (string, bool) {
 	var best Route
 	for _, route := range routes {
-		if strings.HasPrefix(path, route.Path) && len(r.Path) > len(best.Path) {
+		if strings.HasPrefix(path, route.Path) && len(route.Path) > len(best.Path) {
 			best = route
 		}
 	}
