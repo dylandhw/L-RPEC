@@ -11,3 +11,5 @@ routes:
     upstream: http://localhost:1030
   - path: /put
     upstream: http://localhost:1040
+  - path: /
+    upstream: http://localhost:1050
