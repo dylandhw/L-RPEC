@@ -6,6 +6,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 
+	internal "github.com/dylandhw/L-RPEC/internal/proxy"
 	"github.com/spf13/viper"
 )
 
@@ -29,6 +30,12 @@ func main() {
 		fmt.Printf("err reading config file: %s\n", err)
 	}
 	fmt.Printf("config settings: \n%+v\n", viper.AllSettings())
+
+	var routes []internal.Route
+	viper.UnmarshalKey("routes", &routes)
+	for route := range routes {
+		fmt.Println("route: ", route)
+	}
 
 	// targets http testing service
 	target, _ := url.Parse("https://httpbin.org/")
