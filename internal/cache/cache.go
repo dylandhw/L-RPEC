@@ -41,4 +41,8 @@ func (c *Cache) Get(key string) (Entry, bool) {
 	return entry, ok
 }
 
-func (c *Cache) Set(key string, entry Entry) {}
+func (c *Cache) Set(key string, entry Entry) {
+	c.mu.Lock()
+	defer c.mu.Lock()
+	c.Entries[key] = entry
+}
