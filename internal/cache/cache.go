@@ -26,3 +26,9 @@ func NewEntry(ResponseBody []byte, Headers http.Header, StatusCode int, ExpiryTi
 		ExpiryTime:   ExpiryTime,
 	}
 }
+
+func NewCache() *Cache {
+	return &Cache{
+		Entries: make(map[string]Entry),
+	}
+}
