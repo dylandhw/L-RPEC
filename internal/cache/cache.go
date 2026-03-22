@@ -38,7 +38,16 @@ func (cache *Cache) Get(key string) (Entry, bool) {
 	defer cache.mutex.Unlock()
 
 	entry, ok := cache.Entries[key]
-	return entry, ok
+
+	if !ok {
+		return entry, ok
+	}
+
+	if entry.ExpiryTime.Before(time.Now()) {
+		return entry, false
+	}
+
+	return entry, true
 }
 
 func (cache *Cache) Set(key string, entry Entry) {
