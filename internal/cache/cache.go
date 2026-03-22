@@ -14,7 +14,7 @@ type Entry struct {
 }
 
 type Cache struct {
-	mu      sync.Mutex
+	mutex   sync.Mutex
 	Entries map[string]Entry
 }
 
@@ -34,15 +34,15 @@ func NewCache() *Cache {
 }
 
 func (cache *Cache) Get(key string) (Entry, bool) {
-	cache.mu.Lock()
-	defer cache.mu.Unlock()
+	cache.mutex.Lock()
+	defer cache.mutex.Unlock()
 
 	entry, ok := cache.Entries[key]
 	return entry, ok
 }
 
 func (cache *Cache) Set(key string, entry Entry) {
-	cache.mu.Lock()
-	defer cache.mu.Lock()
+	cache.mutex.Lock()
+	defer cache.mutex.Lock()
 	cache.Entries[key] = entry
 }
