@@ -3,6 +3,7 @@ package proxy
 import (
 	"fmt"
 	"net/http"
+	"net/http/httptest"
 	"net/http/httputil"
 	"net/url"
 
@@ -32,17 +33,6 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	entry, hit := h.cache.Get(key)
-	if hit {
-		for key, values := range entry.Headers {
-			for _, value := range values {
-				w.Header().Set(key, value)
-			}
-		}
-		w.WriteHeader(entry.StatusCode)
-		w.Write(entry.ResponseBody)
-	} else {
-
-	}
 
 	target, _ := url.Parse(upstream)
 	proxy := httputil.NewSingleHostReverseProxy(target)
@@ -51,6 +41,21 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("PROXY ERROR: ", err)
 		http.Error(w, err.Error(), http.StatusBadGateway)
 	}
+
 	fmt.Println("forwarding to:", target.String(), r.URL.Path)
-	proxy.ServeHTTP(w, r)
+
+	if hit {
+		for key, values := range entry.Headers {
+			for _, value := range values {
+				w.Header().Set(key, value)
+			}
+		}
+		w.WriteHeader(entry.StatusCode)
+		w.Write(entry.ResponseBody)
+		return
+	} else {
+		rec := httptest.NewRecorder()
+		proxy.ServeHTTP(rec, r)
+
+	}
 }
