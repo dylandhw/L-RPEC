@@ -43,6 +43,6 @@ func (cache *Cache) Get(key string) (Entry, bool) {
 
 func (cache *Cache) Set(key string, entry Entry) {
 	cache.mutex.Lock()
-	defer cache.mutex.Lock()
+	defer cache.mutex.Unlock()
 	cache.Entries[key] = entry
 }
