@@ -4,14 +4,20 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+
+	"github.com/dylandhw/L-RPEC/internal/cache"
 )
 
 type Handler struct {
 	routes []Route
+	cache  *cache.Cache
 }
 
-func New(routes []Route) *Handler {
-	return &Handler{routes: routes}
+func New(routes []Route, cache *cache.Cache) *Handler {
+	return &Handler{
+		routes: routes,
+		cache:  cache,
+	}
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

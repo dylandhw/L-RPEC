@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/dylandhw/L-RPEC/internal/cache"
 	"github.com/dylandhw/L-RPEC/internal/proxy"
 	"github.com/spf13/viper"
 )
@@ -35,8 +36,8 @@ func main() {
 		fmt.Println("route: ", route)
 
 	}
-
-	http.Handle("/", proxy.New(routes)) // need to handle requests to url
+	cache := cache.NewCache()
+	http.Handle("/", proxy.New(routes, cache)) // need to handle requests to url
 
 	fmt.Println("server started on port 8080")
 	err = http.ListenAndServe(":8080", nil)
