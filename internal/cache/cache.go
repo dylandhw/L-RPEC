@@ -33,16 +33,16 @@ func NewCache() *Cache {
 	}
 }
 
-func (c *Cache) Get(key string) (Entry, bool) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+func (cache *Cache) Get(key string) (Entry, bool) {
+	cache.mu.Lock()
+	defer cache.mu.Unlock()
 
-	entry, ok := c.Entries[key]
+	entry, ok := cache.Entries[key]
 	return entry, ok
 }
 
-func (c *Cache) Set(key string, entry Entry) {
-	c.mu.Lock()
-	defer c.mu.Lock()
-	c.Entries[key] = entry
+func (cache *Cache) Set(key string, entry Entry) {
+	cache.mu.Lock()
+	defer cache.mu.Lock()
+	cache.Entries[key] = entry
 }
