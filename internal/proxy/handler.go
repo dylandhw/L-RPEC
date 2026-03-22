@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -21,6 +22,8 @@ func New(routes []Route, cache *cache.Cache) *Handler {
 }
 
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	key := r.Method + r.URL.Path
+	fmt.Println("THIS IS THE KEY: ", key)
 	upstream, ok := Match(h.routes, r.URL.Path)
 	if !ok {
 		http.Error(w, "no matching route", http.StatusBadGateway)
@@ -29,5 +32,10 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	target, _ := url.Parse(upstream)
 	proxy := httputil.NewSingleHostReverseProxy(target)
+
+	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
+		fmt.Println("PROXY ERROR: ", err)
+		http.Error(w, err.Error(), http.StatusBadGateway)
+	}
 	proxy.ServeHTTP(w, r)
 }
