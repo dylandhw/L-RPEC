@@ -37,5 +37,6 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("PROXY ERROR: ", err)
 		http.Error(w, err.Error(), http.StatusBadGateway)
 	}
+	fmt.Println("forwarding to:", target.String(), r.URL.Path)
 	proxy.ServeHTTP(w, r)
 }

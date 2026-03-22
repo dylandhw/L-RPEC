@@ -2,14 +2,14 @@
 # set to httpbin.org standard http methods (again, for convenience)
 routes:
   - path: /delete
-    upstream: http://localhost:1000
+    upstream: https://httpbin.org/
   - path: /get
-    upstream: http://localhost:1010
+    upstream: https://httpbin.org/
   - path: /patch
-    upstream: http://localhost:1020
+    upstream: https://httpbin.org/
   - path: /post
-    upstream: http://localhost:1030
+    upstream: https://httpbin.org/
   - path: /put
-    upstream: http://localhost:1040
+    upstream: https://httpbin.org/
   - path: /
-    upstream: http://localhost:1050
+    upstream: https://httpbin.org/
