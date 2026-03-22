@@ -32,3 +32,7 @@ func NewCache() *Cache {
 		Entries: make(map[string]Entry),
 	}
 }
+
+func Get(key string) (Entry, bool) {}
+
+func Set(key string, entry Entry) {}
