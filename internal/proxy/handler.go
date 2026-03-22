@@ -24,10 +24,24 @@ func New(routes []Route, cache *cache.Cache) *Handler {
 func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	key := r.Method + r.URL.Path
 	fmt.Println("THIS IS THE KEY: ", key)
+
 	upstream, ok := Match(h.routes, r.URL.Path)
 	if !ok {
 		http.Error(w, "no matching route", http.StatusBadGateway)
 		return
+	}
+
+	entry, hit := h.cache.Get(key)
+	if hit {
+		for key, values := range entry.Headers {
+			for _, value := range values {
+				w.Header().Set(key, value)
+			}
+		}
+		w.WriteHeader(entry.StatusCode)
+		w.Write(entry.ResponseBody)
+	} else {
+
 	}
 
 	target, _ := url.Parse(upstream)
