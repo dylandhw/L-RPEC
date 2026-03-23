@@ -46,6 +46,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("forwarding to:", target.String(), r.URL.Path)
 
 	if hit {
+		fmt.Println(">>CACHE HIT<<")
 		for key, values := range entry.Headers {
 			for _, value := range values {
 				w.Header().Set(key, value)
@@ -57,11 +58,22 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else {
 		rec := httptest.NewRecorder()
 		proxy.ServeHTTP(rec, r)
+
 		entry := cache.Entry{
 			ResponseBody: rec.Body.Bytes(),
 			Headers:      rec.Header(),
 			StatusCode:   rec.Code,
 			ExpiryTime:   time.Now().Add(60 * time.Second),
 		}
+		h.cache.Set(key, entry)
+
+		for key, values := range entry.Headers {
+			for _, value := range values {
+				w.Header().Set(key, value)
+			}
+		}
+		w.WriteHeader(entry.StatusCode)
+		w.Write(entry.ResponseBody)
+		return
 	}
 }
