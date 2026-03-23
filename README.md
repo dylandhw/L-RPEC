@@ -3,7 +3,7 @@
 ---------
 Routes incoming requests to upstream servers based, on config, caches response in-mem, then signs outbound requests with HMAC
 
-Essentiall a toy Cloudlfare worker's runtime 
+Essentiall a toy Cloudlfare CDN / reverse proxy
 
 Some references that helped build this:
 - [What is a reverse proxy?](https://www.cloudflare.com/learning/cdn/glossary/reverse-proxy/)

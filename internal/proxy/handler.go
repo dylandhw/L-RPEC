@@ -9,17 +9,20 @@ import (
 	"time"
 
 	"github.com/dylandhw/L-RPEC/internal/cache"
+	"github.com/dylandhw/L-RPEC/internal/signer"
 )
 
 type Handler struct {
-	routes []Route
-	cache  *cache.Cache
+	routes    []Route
+	cache     *cache.Cache
+	secretKey string
 }
 
-func New(routes []Route, cache *cache.Cache) *Handler {
+func New(routes []Route, cache *cache.Cache, secretKey string) *Handler {
 	return &Handler{
-		routes: routes,
-		cache:  cache,
+		routes:    routes,
+		cache:     cache,
+		secretKey: secretKey,
 	}
 }
 
@@ -57,6 +60,9 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	} else {
 		rec := httptest.NewRecorder()
+
+		signer.SignRequest(r, []byte(h.secretKey))
+
 		proxy.ServeHTTP(rec, r)
 
 		entry := cache.Entry{
@@ -65,6 +71,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			StatusCode:   rec.Code,
 			ExpiryTime:   time.Now().Add(60 * time.Second),
 		}
+
 		h.cache.Set(key, entry)
 
 		for key, values := range entry.Headers {

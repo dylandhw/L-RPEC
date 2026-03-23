@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/dylandhw/L-RPEC/internal/cache"
 	"github.com/dylandhw/L-RPEC/internal/proxy"
@@ -18,6 +19,7 @@ import (
 // httpbin.org and gives the client the response
 func main() {
 
+	secretKey := os.Getenv("SECRET_KEY")
 	// viper setup
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
@@ -37,7 +39,7 @@ func main() {
 
 	}
 	cache := cache.NewCache()
-	http.Handle("/", proxy.New(routes, cache)) // need to handle requests to url
+	http.Handle("/", proxy.New(routes, cache, secretKey)) // need to handle requests to url
 
 	fmt.Println("server started on port 8080")
 	err = http.ListenAndServe(":8080", nil)

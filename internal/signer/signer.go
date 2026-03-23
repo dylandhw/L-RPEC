@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -23,4 +24,6 @@ func SignRequest(r *http.Request, secretKey []byte) {
 
 	r.Header.Add("X-Timestamp", timeString)
 	r.Header.Add("X-Signature", hex.EncodeToString(signature))
+
+	fmt.Println("REQUEST SIGNED")
 }
