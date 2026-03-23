@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"net/http/httputil"
 	"net/url"
+	"time"
 
 	"github.com/dylandhw/L-RPEC/internal/cache"
 )
@@ -56,6 +57,11 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	} else {
 		rec := httptest.NewRecorder()
 		proxy.ServeHTTP(rec, r)
-
+		entry := cache.Entry{
+			ResponseBody: rec.Body.Bytes(),
+			Headers:      rec.Header(),
+			StatusCode:   rec.Code,
+			ExpiryTime:   time.Now().Add(60 * time.Second),
+		}
 	}
 }
