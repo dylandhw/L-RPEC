@@ -46,7 +46,7 @@ func main() {
 	fmt.Println("server started on port 8080")
 
 	go func() {
-		time.Sleep(5 * time.Second)
+		time.Sleep(time.Second)
 		metrics.Tests()
 	}()
 
