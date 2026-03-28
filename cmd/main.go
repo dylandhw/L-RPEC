@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/dylandhw/L-RPEC/internal/cache"
 	"github.com/dylandhw/L-RPEC/internal/proxy"
+	"github.com/dylandhw/L-RPEC/metrics"
 	"github.com/spf13/viper"
 )
 
@@ -42,7 +44,14 @@ func main() {
 	http.Handle("/", proxy.New(routes, cache, secretKey)) // need to handle requests to url
 
 	fmt.Println("server started on port 8080")
+
+	go func() {
+		time.Sleep(5 * time.Second)
+		metrics.Tests()
+	}()
+
 	err = http.ListenAndServe(":8080", nil)
+
 	if err != nil {
 		fmt.Println("error serving", err)
 	}
