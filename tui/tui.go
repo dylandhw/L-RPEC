@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	tea "charm.land/bubbletea/v2"
 )
@@ -78,4 +79,13 @@ func (m model) View() tea.View {
 	s += "\n=====press=q=to=quit=====\n"
 
 	return tea.NewView(s)
+}
+
+func main() {
+	p := tea.NewProgram(initialModel())
+
+	if _, err := p.Run(); err != nil {
+		fmt.Printf("error: %v", err)
+		os.Exit(1)
+	}
 }
