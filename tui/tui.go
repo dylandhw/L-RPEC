@@ -73,7 +73,7 @@ func (m model) View() tea.View {
 			checked = "x"
 		}
 
-		s += fmt.Sprintf("%s [%s] %s\n", cursor, checked, choice)
+		s += fmt.Sprintf("\n%s [%s] %s\n", cursor, checked, choice)
 	}
 
 	s += "\n=====press=q=to=quit=====\n"
