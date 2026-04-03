@@ -1,5 +1,9 @@
 package main
 
+import (
+	tea "charm.land/bubbletea/v2"
+)
+
 type model struct {
 	choices  []string
 	cursor   int
@@ -12,4 +16,8 @@ func initialModel() model {
 
 		selected: make(map[int]struct{}),
 	}
+}
+
+func (m model) Init() tea.Cmd {
+	return nil
 }
