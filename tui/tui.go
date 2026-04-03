@@ -5,3 +5,11 @@ type model struct {
 	cursor   int
 	selected map[int]struct{}
 }
+
+func initialModel() model {
+	return model{
+		choices: []string{"Run Vegeta stress testing"},
+
+		selected: make(map[int]struct{}),
+	}
+}
