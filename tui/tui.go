@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	tea "charm.land/bubbletea/v2"
 )
 
@@ -54,4 +56,26 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	return m, nil
+}
+
+func (m model) View() tea.View {
+	s := "=====RUN=SERVICE=TESTS====="
+
+	for i, choice := range m.choices {
+		cursor := " "
+		if m.cursor == i {
+			cursor = ">"
+		}
+
+		checked := " "
+		if _, ok := m.selected[i]; ok {
+			checked = "x"
+		}
+
+		s += fmt.Sprintf("%s [%s] %s\n", cursor, checked, choice)
+	}
+
+	s += "\n=====press=q=to=quit=====\n"
+
+	return tea.NewView(s)
 }
