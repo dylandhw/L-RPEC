@@ -4,11 +4,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/dylandhw/L-RPEC/internal/cache"
 	"github.com/dylandhw/L-RPEC/internal/proxy"
-	"github.com/dylandhw/L-RPEC/metrics"
 	"github.com/spf13/viper"
 )
 
@@ -45,10 +43,11 @@ func main() {
 
 	fmt.Println("server started on port 8080")
 
-	go func() {
-		time.Sleep(time.Second)
-		metrics.Tests()
-	}()
+	//go func() {
+	//time.Sleep(time.Second)
+	//fmt.Println("\033[32m✔ Running Metrics\033[0m")
+	//metrics.Tests()
+	//}()
 
 	err = http.ListenAndServe(":8080", nil)
 
