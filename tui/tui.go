@@ -73,6 +73,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.state = howItWorksState
 				return m, nil
 			}
+		case "b":
+			if m.state != menuState {
+				m.state = menuState
+				return m, nil
+			}
 		}
 	}
 
@@ -88,6 +93,7 @@ const banner = `
  ╚══════╝		   ╚═╝  ╚═╝ ╚═╝      ╚══════╝  ╚═════╝`
 
 var (
+	/* MENU STATE */
 	footer = lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#b4b6b8")).
 		Faint(true)
@@ -103,8 +109,6 @@ var (
 	bannerStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("#1ddb26")).
 			Bold(true)
-	bannerStyleTwo = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#fcba03"))
 )
 
 func (m model) View() tea.View {
@@ -138,7 +142,7 @@ func (m model) renderMenu() tea.View {
 			boldWhite.Render(choice),
 		))
 	}
-	s.WriteString(footer.Render("\nCommands: ↑/↓ to navigate, [enter] to toggle, ctrl+c/q to quit \n"))
+	s.WriteString(footer.Render("\nCommands: ↑/↓ to navigate, [enter] to toggle, b to go back, ctrl+c/q to quit \n"))
 
 	content := lipgloss.JoinVertical(lipgloss.Center, b, s.String())
 
@@ -150,30 +154,24 @@ func (m model) renderMenu() tea.View {
 		content,
 	))
 }
+
+var (
+	/* HOW IT WORKS */
+	paragraph = lipgloss.NewStyle().
+		Width(60).
+		Foreground(lipgloss.Color("#b4b6b8")).
+		Bold(true)
+)
+
 func (m model) renderHowItWorks() tea.View {
-	b := bannerStyleTwo.Render(banner)
+	b := bannerStyle.Render(banner)
 	var s strings.Builder
 	s.WriteString("\n")
-	for i, choice := range m.choices {
-		cursor := " "
-		if m.cursor == i {
-			cursor = "»"
-		}
-		checked := " "
-		if _, ok := m.selected[i]; ok {
-			checked = "✗"
-		}
-		s.WriteString(fmt.Sprintf("%s %s%s%s %s\n",
-			check.Render(cursor),
-			boldWhite.Render("["),
-			check.Render(checked),
-			boldWhite.Render("]"),
-			boldWhite.Render(choice),
-		))
-	}
-	s.WriteString(footer.Render("\nCommands: ↑/↓ to navigate, [enter] to toggle, ctrl+c/q to quit \n"))
 
-	content := lipgloss.JoinVertical(lipgloss.Center, b, s.String())
+	text := paragraph.Render("L-RPEC is a lightweight reverse proxy that routes incoming requests based on configuration, caches responses in memory, and signs outbound requests using HMAC. It acts as a simplified edge layer, similar to a CDN, allowing you to experiment with caching strategies, routing logic, and request security.")
+
+	s.WriteString(footer.Render("\nCommands: ↑/↓ to navigate, [enter] to toggle, ctrl+c/q to quit \n"))
+	content := lipgloss.JoinVertical(lipgloss.Center, b, text, s.String())
 
 	return tea.NewView(lipgloss.Place(
 		m.width,
