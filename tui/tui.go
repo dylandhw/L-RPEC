@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	tea "charm.land/bubbletea/v2"
 	"github.com/charmbracelet/lipgloss"
@@ -95,7 +96,8 @@ const banner = `
 func (m model) View() tea.View {
 	b := bannerStyle.Render(banner)
 
-	s := fmt.Sprintf("\n")
+	var s strings.Builder
+	s.WriteString("\n")
 	for i, choice := range m.choices {
 		cursor := " "
 		if m.cursor == i {
@@ -105,17 +107,17 @@ func (m model) View() tea.View {
 		if _, ok := m.selected[i]; ok {
 			checked = "✗"
 		}
-		s += fmt.Sprintf("%s %s%s%s %s\n",
+		s.WriteString(fmt.Sprintf("%s %s%s%s %s\n",
 			check.Render(cursor),
 			boldWhite.Render("["),
 			check.Render(checked),
 			boldWhite.Render("]"),
 			boldWhite.Render(choice),
-		)
+		))
 	}
-	s += footer.Render("\nCommands: ↑/↓ to navigate, [enter] to toggle, ctrl+c/q to quit \n")
+	s.WriteString(footer.Render("\nCommands: ↑/↓ to navigate, [enter] to toggle, ctrl+c/q to quit \n"))
 
-	content := lipgloss.JoinVertical(lipgloss.Center, b, s)
+	content := lipgloss.JoinVertical(lipgloss.Center, b, s.String())
 
 	return tea.NewView(lipgloss.Place(
 		m.width,
