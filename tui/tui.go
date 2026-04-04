@@ -168,10 +168,16 @@ func (m model) renderHowItWorks() tea.View {
 	var s strings.Builder
 	s.WriteString("\n")
 
-	text := paragraph.Render("L-RPEC is a lightweight reverse proxy that routes incoming requests based on configuration, caches responses in memory, and signs outbound requests using HMAC. It acts as a simplified edge layer, similar to a CDN, allowing you to experiment with caching strategies, routing logic, and request security.")
-
-	s.WriteString(footer.Render("\nCommands: ↑/↓ to navigate, [enter] to toggle, ctrl+c/q to quit \n"))
-	content := lipgloss.JoinVertical(lipgloss.Center, b, text, s.String())
+	text1 := paragraph.Render("\nL-RPEC is a lightweight reverse proxy that routes incoming requests based on configuration, caches responses in memory, and signs outbound requests using HMAC. It acts as a simplified edge layer, similar to a CDN, allowing you to experiment with caching strategies, routing logic, and request security.")
+	text2 := paragraph.Render("\nEssentially a toy Cloudlfare CDN. Largely made to satisfy my curiosity about infrastructure. The core functionality is built entirely with the Go stdlib, you can find a more technical insight below.")
+	s.WriteString(footer.Render("\nCommands: ↑/↓ to navigate, [enter] to toggle, b to go back, ctrl+c/q to quit \n"))
+	content := lipgloss.JoinVertical(
+		lipgloss.Center,
+		b,
+		text1,
+		text2,
+		s.String(),
+	)
 
 	return tea.NewView(lipgloss.Place(
 		m.width,
