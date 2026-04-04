@@ -9,7 +9,15 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
+type state int
+
+const (
+	menuState state = iota
+	howItWorksState
+)
+
 type model struct {
+	state    state
 	choices  []string
 	cursor   int
 	selected map[int]struct{}
@@ -67,6 +75,14 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+const banner = `
+ ██╗      		   ██████╗  ██████  ███████╗  ██████╗
+ ██║     		   ██╔══██╗ ██╔══██  ██╔════╝ ██╔════╝
+ ██║      ██████    ██████╔╝ ██████║  █████╗   ██║
+ ██║     		   ██╔══██╗ ██╔═══╝  ██╔══╝   ██║
+ ███████╗		   ██║  ██║ ██║      ███████╗ ╚██████╗
+ ╚══════╝		   ╚═╝  ╚═╝ ╚═╝      ╚══════╝  ╚═════╝`
+
 var (
 	footer = lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#b4b6b8")).
@@ -75,7 +91,7 @@ var (
 		Foreground(lipgloss.Color("#1d7fdb")).
 		Bold(true)
 	check = lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#1ddb26")).
+		Foreground(lipgloss.Color("#fcba03")).
 		Bold(true)
 	boldWhite = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("white")).
@@ -85,23 +101,14 @@ var (
 			Bold(true)
 )
 
-const banner = `
- ██╗      		   ██████╗  ██████  ███████╗  ██████╗
- ██║     		   ██╔══██╗ ██╔══██  ██╔════╝ ██╔════╝
- ██║      ██████    ██████╔╝ ██████║  █████╗   ██║
- ██║     		   ██╔══██╗ ██╔═══╝  ██╔══╝   ██║
- ███████╗		   ██║  ██║ ██║      ███████╗ ╚██████╗
- ╚══════╝		   ╚═╝  ╚═╝ ╚═╝      ╚══════╝  ╚═════╝`
-
 func (m model) View() tea.View {
 	b := bannerStyle.Render(banner)
-
 	var s strings.Builder
 	s.WriteString("\n")
 	for i, choice := range m.choices {
 		cursor := " "
 		if m.cursor == i {
-			cursor = ">"
+			cursor = "»"
 		}
 		checked := " "
 		if _, ok := m.selected[i]; ok {
