@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	tea "charm.land/bubbletea/v2"
 	"github.com/charmbracelet/lipgloss"
@@ -14,15 +15,22 @@ type state int
 const (
 	menuState state = iota
 	howItWorksState
+	vegetaStressTestState
 )
 
 type model struct {
+	// generic frame
 	state    state
 	choices  []string
 	cursor   int
 	selected map[int]struct{}
 	width    int
 	height   int
+
+	// progress bar
+	progress float64
+	duration time.Duration
+	testing  bool
 }
 
 func initialModel() model {
@@ -37,12 +45,33 @@ func (m model) Init() tea.Cmd {
 	return nil
 }
 
+type tickMsg time.Time
+
+func tickCmd() tea.Cmd {
+	return tea.Tick(16*time.Millisecond, func(t time.Time) tea.Msg {
+		return tickMsg(t)
+	})
+}
+
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.height = msg.Height
+
+	case tickMsg:
+		if m.testing {
+			totalTicks := m.duration.Seconds() * (1000.0 / 16.0) // ticks per second
+			m.progress += 1.0 / totalTicks
+
+			if m.progress >= 1.0 {
+				m.progress = 1.0
+				m.testing = false
+				return m, nil
+			}
+			return m, tickCmd()
+		}
 
 	case tea.KeyPressMsg:
 
@@ -72,6 +101,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if choice == "How It Works             " {
 				m.state = howItWorksState
 				return m, nil
+			} else if choice == "Run Vegeta Stress Testing" {
+				m.state = vegetaStressTestState
+				m.testing = true
+				m.duration = 10 * time.Second
+				return m, tickCmd()
 			}
 		case "b":
 			if m.state != menuState {
@@ -98,7 +132,7 @@ var (
 		Foreground(lipgloss.Color("#b4b6b8")).
 		Faint(true)
 	header = lipgloss.NewStyle().
-		Foreground(lipgloss.Color("#1d7fdb")).
+		Foreground(lipgloss.Color("#fcba03")). // #1d7fdb
 		Bold(true)
 	check = lipgloss.NewStyle().
 		Foreground(lipgloss.Color("#fcba03")).
@@ -107,7 +141,7 @@ var (
 			Foreground(lipgloss.Color("white")).
 			Bold(true)
 	bannerStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("#1ddb26")).
+			Foreground(lipgloss.Color("#fcba03")).
 			Bold(true)
 )
 
@@ -117,6 +151,8 @@ func (m model) View() tea.View {
 		return m.renderMenu()
 	case howItWorksState:
 		return m.renderHowItWorks()
+	case vegetaStressTestState:
+		return m.renderVegetaStressTest()
 	}
 	return m.renderMenu()
 }
@@ -176,6 +212,51 @@ func (m model) renderHowItWorks() tea.View {
 		b,
 		text1,
 		text2,
+		s.String(),
+	)
+
+	return tea.NewView(lipgloss.Place(
+		m.width,
+		m.height,
+		lipgloss.Center,
+		lipgloss.Center,
+		content,
+	))
+}
+
+var (
+	progressBarFill  = lipgloss.NewStyle().Foreground(lipgloss.Color("#fcba03")).Bold(true)
+	progressBarEmpty = lipgloss.NewStyle().Foreground(lipgloss.Color("#333333"))
+	progressLabel    = lipgloss.NewStyle().Foreground(lipgloss.Color("#b4b6b8")).Bold(true)
+)
+
+func (m model) renderVegetaStressTest() tea.View {
+	b := bannerStyle.Render(banner)
+	var s strings.Builder
+
+	barWidth := 50
+	filled := int(m.progress * float64(barWidth))
+	empty := barWidth - filled
+
+	bar := progressBarFill.Render(strings.Repeat("█", filled)) +
+		progressBarEmpty.Render(strings.Repeat("░", empty))
+
+	pct := int(m.progress * 100)
+	label := progressLabel.Render(fmt.Sprintf("\nRunning stress test... %d%%\n", pct))
+
+	status := ""
+	if !m.testing && m.progress >= 1.0 {
+		status = progressLabel.Render("Stress test completed\n")
+	}
+
+	s.WriteString(label)
+	s.WriteString("\n  " + bar + "\n\n")
+	s.WriteString(status)
+	s.WriteString(footer.Render("\nCommands: b to go back, ctrl+c/q to quit\n"))
+
+	content := lipgloss.JoinVertical(
+		lipgloss.Center,
+		b,
 		s.String(),
 	)
 
