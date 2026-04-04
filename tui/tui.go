@@ -51,24 +51,28 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case "ctrl+c", "q":
 			return m, tea.Quit
 
-		case "up", "k":
+		case "up":
 			if m.cursor > 0 {
 				m.cursor--
 			}
 
-		case "down", "j":
+		case "down":
 			if m.cursor < len(m.choices)-1 {
 				m.cursor++
 			}
 
-		case "enter", "space":
+		case "enter":
 			_, ok := m.selected[m.cursor]
+			choice := m.choices[m.cursor]
 			if ok {
 				delete(m.selected, m.cursor)
 			} else {
 				m.selected[m.cursor] = struct{}{}
 			}
-
+			if choice == "How it works" {
+				m.state = howItWorksState
+				return m, nil
+			}
 		}
 	}
 
@@ -102,6 +106,18 @@ var (
 )
 
 func (m model) View() tea.View {
+	switch m.state {
+	case menuState:
+		return m.renderMenu()
+	case howItWorksState:
+		return m.renderHowItWorks()
+	}
+}
+
+func (m model) renderMenu() tea.View       {}
+func (m model) renderHowItWorks() tea.View {}
+
+func (m model) temp() tea.View {
 	b := bannerStyle.Render(banner)
 	var s strings.Builder
 	s.WriteString("\n")
