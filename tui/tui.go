@@ -69,7 +69,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			} else {
 				m.selected[m.cursor] = struct{}{}
 			}
-			if choice == "How it works" {
+			if choice == "How It Works             " {
 				m.state = howItWorksState
 				return m, nil
 			}
@@ -103,6 +103,8 @@ var (
 	bannerStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("#1ddb26")).
 			Bold(true)
+	bannerStyleTwo = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#fcba03"))
 )
 
 func (m model) View() tea.View {
@@ -112,13 +114,44 @@ func (m model) View() tea.View {
 	case howItWorksState:
 		return m.renderHowItWorks()
 	}
+	return m.renderMenu()
 }
 
-func (m model) renderMenu() tea.View       {}
-func (m model) renderHowItWorks() tea.View {}
-
-func (m model) temp() tea.View {
+func (m model) renderMenu() tea.View {
 	b := bannerStyle.Render(banner)
+	var s strings.Builder
+	s.WriteString("\n")
+	for i, choice := range m.choices {
+		cursor := " "
+		if m.cursor == i {
+			cursor = "»"
+		}
+		checked := " "
+		if _, ok := m.selected[i]; ok {
+			checked = "✗"
+		}
+		s.WriteString(fmt.Sprintf("%s %s%s%s %s\n",
+			check.Render(cursor),
+			boldWhite.Render("["),
+			check.Render(checked),
+			boldWhite.Render("]"),
+			boldWhite.Render(choice),
+		))
+	}
+	s.WriteString(footer.Render("\nCommands: ↑/↓ to navigate, [enter] to toggle, ctrl+c/q to quit \n"))
+
+	content := lipgloss.JoinVertical(lipgloss.Center, b, s.String())
+
+	return tea.NewView(lipgloss.Place(
+		m.width,
+		m.height,
+		lipgloss.Center,
+		lipgloss.Center,
+		content,
+	))
+}
+func (m model) renderHowItWorks() tea.View {
+	b := bannerStyleTwo.Render(banner)
 	var s strings.Builder
 	s.WriteString("\n")
 	for i, choice := range m.choices {
