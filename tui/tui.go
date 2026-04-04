@@ -28,9 +28,10 @@ type model struct {
 	height   int
 
 	// progress bar
-	progress float64
-	duration time.Duration
-	testing  bool
+	progress  float64
+	duration  time.Duration
+	testing   bool
+	completed bool
 }
 
 func initialModel() model {
@@ -66,8 +67,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.progress += 1.0 / totalTicks
 
 			if m.progress >= 1.0 {
-				m.progress = 1.0
+				m.progress = 0.0
 				m.testing = false
+				m.completed = true
 				return m, nil
 			}
 			return m, tickCmd()
@@ -104,6 +106,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			} else if choice == "Run Vegeta Stress Testing" {
 				m.state = vegetaStressTestState
 				m.testing = true
+				m.completed = false
 				m.duration = 10 * time.Second
 				return m, tickCmd()
 			}
@@ -194,9 +197,16 @@ func (m model) renderMenu() tea.View {
 var (
 	/* HOW IT WORKS */
 	paragraph = lipgloss.NewStyle().
+			Width(60).
+			Foreground(lipgloss.Color("#b4b6b8")).
+			Bold(true)
+
+	link = lipgloss.NewStyle().
 		Width(60).
-		Foreground(lipgloss.Color("#b4b6b8")).
-		Bold(true)
+		Underline(false).
+		Bold(true).
+		Foreground(lipgloss.Color("#2754e8")).
+		Faint(true)
 )
 
 func (m model) renderHowItWorks() tea.View {
@@ -206,12 +216,23 @@ func (m model) renderHowItWorks() tea.View {
 
 	text1 := paragraph.Render("\nL-RPEC is a lightweight reverse proxy that routes incoming requests based on configuration, caches responses in memory, and signs outbound requests using HMAC. It acts as a simplified edge layer, similar to a CDN, allowing you to experiment with caching strategies, routing logic, and request security.")
 	text2 := paragraph.Render("\nEssentially a toy Cloudlfare CDN. Largely made to satisfy my curiosity about infrastructure. The core functionality is built entirely with the Go stdlib, you can find a more technical insight below.")
+	text3 := paragraph.Render("\nBelow are some links that I found helpful when building this.")
+	link1 := link.Render("\n- What is a reverse proxy?")
+	link2 := link.Render("- HTTP Caching")
+	link3 := link.Render("- How CDNs Work")
+	link4 := link.Render("- Signing Requests")
+
 	s.WriteString(footer.Render("\nCommands: ↑/↓ to navigate, [enter] to toggle, b to go back, ctrl+c/q to quit \n"))
 	content := lipgloss.JoinVertical(
 		lipgloss.Center,
 		b,
 		text1,
 		text2,
+		text3,
+		link1,
+		link2,
+		link3,
+		link4,
 		s.String(),
 	)
 
@@ -238,28 +259,33 @@ func (m model) renderVegetaStressTest() tea.View {
 	filled := int(m.progress * float64(barWidth))
 	empty := barWidth - filled
 
-	bar := progressBarFill.Render(strings.Repeat("█", filled)) +
-		progressBarEmpty.Render(strings.Repeat("░", empty))
+	if !m.completed {
+		bar := progressBarFill.Render(strings.Repeat("█", filled)) +
+			progressBarEmpty.Render(strings.Repeat("░", empty))
 
-	pct := int(m.progress * 100)
-	label := progressLabel.Render(fmt.Sprintf("\nRunning stress test... %d%%\n", pct))
+		pct := int(m.progress * 100)
+		label := progressLabel.Render(fmt.Sprintf("\nRunning stress test... %d%%\n", pct))
 
-	status := ""
-	if !m.testing && m.progress >= 1.0 {
-		status = progressLabel.Render("Stress test completed\n")
+		status := ""
+		if !m.testing && m.progress == 0.0 {
+			status = progressLabel.Render("Stress test completed\n")
+		}
+
+		s.WriteString(label)
+		s.WriteString("\n  " + bar + "\n\n")
+		s.WriteString(status)
+		s.WriteString(footer.Render("\nCommands: b to go back, ctrl+c/q to quit\n"))
+
 	}
-
-	s.WriteString(label)
-	s.WriteString("\n  " + bar + "\n\n")
-	s.WriteString(status)
-	s.WriteString(footer.Render("\nCommands: b to go back, ctrl+c/q to quit\n"))
-
 	content := lipgloss.JoinVertical(
 		lipgloss.Center,
 		b,
 		s.String(),
 	)
-
+	/*
+	 SO WE HAVE A ROUGH IDEA OF WHERE WE ARE AT.... IT DISABLES THE BAR UPON COMPLETION (YAY!)
+	 BUT IT ALSO DISABLES THE STATUS MESSAGES AND THE CONTROLS FOOTER...SO LET'S FIX THIS TOMORROW
+	*/
 	return tea.NewView(lipgloss.Place(
 		m.width,
 		m.height,
