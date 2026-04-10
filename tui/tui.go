@@ -160,6 +160,7 @@ func (m model) View() tea.View {
 	return m.renderMenu()
 }
 
+/* NEED TO ADD A FLAG FOR CALLER TYPE */
 func (m model) renderMenu() tea.View {
 	b := bannerStyle.Render(banner)
 	var s strings.Builder
@@ -168,6 +169,7 @@ func (m model) renderMenu() tea.View {
 		cursor := " "
 		if m.cursor == i {
 			cursor = "»"
+
 		}
 		checked := " "
 		if _, ok := m.selected[i]; ok {

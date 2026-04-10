@@ -14,4 +14,4 @@ func LoadGeneration() {
 	}
 }
 
-// vegeta attack -duration=10s -rate=100 -targets=targets.txt | vegeta report >> reports.txt
+// vegeta attack -duration=10s -rate=20000 -targets=targets.txt | vegeta report >> reports.txt
